@@ -5,6 +5,7 @@ from datetime import timedelta
 # Flask Imports
 from flask import Flask
 from flask_cors import CORS
+from flask_jwt_extended import JWTManager
 # App Imports
 import routes
 from extensions import db
@@ -22,12 +23,16 @@ def create_app():
 
     # Load configuration from environment variables
     app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URI')
-    app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False  # Optional: Disable modification tracking for performance
-    app.secret_key = os.getenv('SECRET_KEY')
+    app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+    app.config['JWT_SECRET_KEY'] = os.getenv('SECRET_KEY')
+    app.config['JWT_TOKEN_LOCATION'] = ['cookies']
+    app.config['JWT_COOKIE_SECURE'] = False
+    app.config['JWT_ACCESS_TOKEN_EXPIRES'] = timedelta(hours=1)
 
     # Initialize extensions
     db.init_app(app)
-    CORS(app)  # Enable CORS to allow requests from the React frontend
+    jwt = JWTManager(app)
+    CORS(app, supports_credentials=True)
 
     # Register blueprints
     app.register_blueprint(routes.main_bp)
@@ -42,7 +47,6 @@ def create_app():
 
 # Create the Flask app instance
 app = create_app()
-
 
 if __name__ == "__main__":
     app.run(debug=True)

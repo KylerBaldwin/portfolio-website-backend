@@ -3,7 +3,7 @@ import os
 # Flask Imports
 from flask import Blueprint, jsonify, redirect, session, request, url_for
 from whoop.whoop_api import Whoop
-# Util Imports
+# App Imports
 from utils import generate_state_value
 from models import User
 from extensions import db
